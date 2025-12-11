@@ -2,6 +2,8 @@ package com.djhb.movie_service.tmdb.Service;
 
 import com.djhb.movie_service.tmdb.Model.Movie;
 import com.djhb.movie_service.tmdb.Repository.MovieRepository;
+import com.djhb.movie_service.tmdb.exception.InvalidDataException;
+import com.djhb.movie_service.tmdb.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,20 +19,20 @@ public class MovieService {
 
     public Movie create(Movie movie) {
         if (movie == null) {
-            throw new RuntimeException("Movie is null");
+            throw new InvalidDataException("Invalid movie: null");
         }
         return movieRepository.save(movie);
     }
 
     public Movie read(Long id) {
         return movieRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                .orElseThrow(() -> new NotFoundException("Movie not found with id: " + id));
     }
 
     public void update(Long id, Movie update) {
 
         if (update == null || id == null) {
-            throw new RuntimeException("Movie or ID is null");
+            throw new InvalidDataException("Invalid movie: null");
         }
 
                if (movieRepository.existsById(id)) {
@@ -41,7 +43,7 @@ public class MovieService {
                    movie.setActors(update.getActors());
                    movieRepository.save(movie);
                }else {
-                   throw new RuntimeException("Movie not found");
+                   throw new NotFoundException("Movie not found with id: " +id);
                }
 
         }
@@ -50,7 +52,7 @@ public class MovieService {
         if (movieRepository.existsById(id)) {
             movieRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Movie not found");
+            throw new NotFoundException("Movie not found with id: " +id);
         }
     }
 }
